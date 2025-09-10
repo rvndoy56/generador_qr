@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Código QR</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {    
+            color: #333;
+        }
+        #qr-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #qrcode {
+            margin: 20px auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            display: inline-block;
+        }
+        .options {
+            margin: 15px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de Código QR</h1>
+    
+    <input type="text" id="qr-input" placeholder="Introduce el texto o URL para el QR">
+    
+    <div class="options">
+        <label for="qr-size">Tamaño (px): </label>
+        <input type="number" id="qr-size" min="50" max="1000" value="200">
+        
+        <label for="qr-color">Color: </label>
+        <input type="color" id="qr-color" value="#000000">
+        
+        <label for="qr-bg">Fondo: </label>
+        <input type="color" id="qr-bg" value="#ffffff">
+    </div>
+    
+    <button onclick="generateQR()">Generar QR</button>
+    <button onclick="downloadQR()" id="download-btn" disabled>Descargar QR</button>
+    
+    <div id="qrcode"></div>
+    
+    <script>
+        let currentQR = null;
+        
+        function generateQR() {
+            const input = document.getElementById('qr-input').value;
+            const size = document.getElementById('qr-size').value;
+            const color = document.getElementById('qr-color').value;
+            const bgColor = document.getElementById('qr-bg').value;
+            
+            if (!input) {
+                alert('Por favor, introduce un texto o URL');
+                return;
+            }
+            
+            // Limpiar el QR anterior
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Crear nuevo QR
+            currentQR = new QRCode(document.getElementById('qrcode'), {
+                text: input,
+                width: parseInt(size),
+                height: parseInt(size),
+                colorDark: color,
+                colorLight: bgColor,
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // Habilitar botón de descarga
+            document.getElementById('download-btn').disabled = false;
+        }
+        
+        function downloadQR() {
+            if (!currentQR) {
+                alert('Primero genera un código QR');
+                return;
+            }
+            
+            const canvas = document.querySelector('#qrcode canvas');
+            const img = canvas.toDataURL('image/png');
+            
+            const link = document.createElement('a');
+            link.download = 'codigo-qr.png';
+            link.href = img;
+            link.click();
+        }
+        
+        // Generar QR al presionar Enter
+        document.getElementById('qr-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+    </script>
+</body>
+</html>
